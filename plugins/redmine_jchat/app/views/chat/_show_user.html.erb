@@ -1,0 +1,8 @@
+<ul class="users" id="show_users" style="">
+	<% users.each do |user| %>
+		<li>
+			<%= avatar user, :size => "20" %>
+			<%= user.firstname %> <%= user.lastname %>
+		</li>
+	<% end %>
+</ul>

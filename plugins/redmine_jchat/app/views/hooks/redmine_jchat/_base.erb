@@ -1,0 +1,190 @@
+<% if User.current.logged? %>
+	<%= stylesheet_link_tag 'main.css', :plugin => 'redmine_jchat' %>
+	<%= javascript_include_tag 'main.js', :plugin => 'redmine_jchat' %>
+<% end %>
+
+<% if User.current.logged? %>
+<%
+	@projects = User.current.projects
+	@users = User.active.joins(:members).where("#{Member.table_name}.project_id = ?", @projects.first.id)
+	@chats = Chat.where(project: @projects.first.id)
+%>
+
+<div class="open-chat cursor-pointer ">Chat</div>
+<div id="form-chat" >
+	<!-- <input type="color" name="mausac"><br> -->
+	<span class="hide-chat cursor-pointer"><%= image_tag('icon-hide.png', :plugin => 'redmine_jchat', :style => 'width: 13px;') %></span>
+	<div id="show-user">
+		<span class="hide-user cursor-pointer"><%= image_tag('drop-left.png', :plugin => 'redmine_jchat', :style => 'width: 13px;') %></span>
+		<p style="font-size: 15px;color: rgb(0, 22, 231);padding: 5px;margin: 0px;">Du an</p>
+		<ul class="select-project">
+			<% @projects.each do |project| %>
+					<li value="<%= project.id %>">
+					<%= image_tag('project-icon.png', :plugin => 'redmine_jchat', :style => 'width: 20px;') %>
+					<%= project.name %></li>
+				<% end %>
+		</ul>
+		<p style="font-size: 15px;color: rgb(0, 22, 231);padding: 5px;margin: 0px;">Thanh Vien</p>
+
+		<%= render :partial => '/chat/show_user', :locals => {:users => @users}%>
+
+	</div>
+	<div id="show-chat">
+		<span class="show-user cursor-pointer"><%= image_tag('drop-right.png', :plugin => 'redmine_jchat', :style => 'width: 13px;') %></span>
+		<div class="select-project" style="width: 100%" >
+			<span>Chon du an:</span>
+			<select>
+				<% Project.all.each do |project| %>
+					<option value="<%= project.id %>" ><%= project.name %></option>
+				<% end %>
+			</select>
+      <select class="select-time">
+          <option value="2" >hom qua</option>
+          <option value="7" >7 ngay</option>
+          <option value="30" >30 ngay</option>
+          <option value="183" >6 thang</option>
+          <option value="365" >1 nam</option>
+          <option value="" >tat ca</option>
+      </select>
+		</div>
+		
+		<%= render :partial => '/chat/show_chat', :locals => {:chats => @chats}%>
+
+	</div>
+	<div id="input-chat">
+		<input type="text" id="send-text" class="chat" />
+		<input class="send-text" type="submit" value="Send" >
+	</div>
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function(){
+
+    // load lai chat sau 5s
+    window.setInterval(function(){
+      var project = $('.active-project').attr('value');
+      $.ajax({
+        url : '/chats/index',
+        type : "GET",
+        data : 'project=' + project,
+        dataType : "script",
+        success : function(data) {
+        }
+      });
+    }, 5000);
+
+    $('body').on("click",".select-project",function(){
+      var project = $('.active-project').attr('value');
+      $.ajax({
+        url : '/chats/index',
+        type : "GET",
+        data : 'project=' + project,
+        dataType : "script",
+        success : function(data) {
+          $.ajax({
+            url : '/chats/show_user',
+            type : "GET",
+            data : 'project=' + project,
+            dataType : "script",
+            success : function(data) {
+              
+            }
+          });
+        }
+      });
+    })
+
+    $( "body" ).on('click', '.open-chat',function(){
+      $( "#form-chat" ).animate({
+        opacity: 1,
+        right: "+=0",
+        height: "toggle"
+      }, 1000);
+    });
+
+    $( "body" ).on('click', '.hide-chat',function(){
+      $( "#form-chat" ).animate({
+        opacity: 1,
+        right: "+=0",
+        height: "toggle"
+      }, 1000);
+    });
+
+    // $( "body" ).on('click', '.hide-user',function(){
+    //   $( "#show-user" ).animate({
+    //     opacity: 1,
+    //     left: "+=0",
+    //     width: "hide"
+    //   }, 1000 );
+    //   $('#show-chat').addClass( "width-100", 1000, "easeOutBounce" );
+    // });
+
+    // $("body").on('click', '.open-chat',function(){
+    //   $('#form-chat').show();
+    //   $("#chat-room ul").scrollTop($("#chat-room ul")[0].scrollHeight);
+    // });
+
+    // $("body").on('click', '.hide-chat',function(){
+    //   $('#form-chat').hide();
+    // });
+
+    $("body").on('click', '.hide-user',function(){
+      $('#show-user').hide();
+      $('.show-user').show();
+      $('#show-chat').addClass('width-100');
+    });
+
+    $("body").on('click', '.show-user',function(){
+      $('#show-user').show();
+      $('#show-chat').removeClass('width-100');
+      $('.show-user').hide();
+    });
+
+    $('.select-project li:first').addClass('active-project');
+
+      $("body").on('click', '.select-project li',function(){
+      $('.select-project li').removeClass('active-project');
+      $(this).addClass('active-project');
+    });
+
+    $('.chat').keyup(function (event) {
+      if (event.keyCode == '13') {
+        var message = $(this).parent().find('.chat').val();
+        var project = $('.active-project').attr('value');
+        if (message != "") {
+          $('.chat').val("");
+          $.ajax({
+            url : '/chats/create',
+            type : "POST",
+            data : 'message=' + message + '&project=' + project,
+            dataType : "script",
+            success : function(data) {
+            }
+          });
+        }else{
+          return false
+        };
+      }
+    });
+
+    $('body').on("click",".send-text",function(){
+      var message = $(this).parent().find('.chat').val();
+      var project = $('.active-project').attr('value');
+      if (message != "") {
+        $('.chat').val("");
+        $.ajax({
+          url : '/chats/create',
+          type : "POST",
+          data : 'message=' + message + '&project=' + project,
+          dataType : "script",
+          success : function(data) {
+          }
+        });
+      }else{
+        return false
+      };
+    })
+  });
+</script>
+
+<% end %>

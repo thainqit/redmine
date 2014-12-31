@@ -1,0 +1,15 @@
+<div class="chat-room" id="chat-room">
+	<ul>
+		<% chats.each do |chat| %>
+			<li>
+				<span class="date-chat"><%= chat.created_at.to_formatted_s(:db) %></span> 
+				<% if chat.user == User.current.id %>
+					<span class="user-chat"> <%= User.find(chat.user).firstname %> <%= User.find(chat.user).lastname %>: </span>
+				<% else %>
+					<span class="user-chat current-user"> <%= User.find(chat.user).firstname %> <%= User.find(chat.user).lastname %>: </span>
+				<% end %>
+				<%= chat.message %>
+			</li>
+		<% end %>
+	</ul>
+</div>

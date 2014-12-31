@@ -1,0 +1,108 @@
+#wt-content {
+	width: 100%;
+}
+.wt-header {
+	height: 30px;
+	width: 100%;
+	text-align: right;
+}
+.title-month {
+	text-align: center;
+	line-height: 54px;
+	margin: 0px;
+}
+.wt-month-table {
+	overflow: auto;
+	padding: 5px 0px;
+	width: 100%;
+	border: 1px solid #CACACA;
+	margin-top: 10px;
+}
+.month-table-left {
+	float: left;
+	width: 19.5%;
+	background: #ddd;
+}
+.month-table-right {
+	float: right;
+	width: 80%;
+	background: #fff;
+}
+.month-table-right tr {
+	border: 1px solid #CACACA;
+}
+.month-table-right tr th {
+	background: #ADADAD;
+	width: 30px;
+	font-size: 15px;
+	height: 30px;
+	border: 1px solid #CACACA;
+}
+.month-table-right tr td {
+	border: 1px solid #CACACA;
+	width: 30px;
+	text-align: center;
+	height: 25px;
+}
+.day {
+	height: 20px !important;
+	background: rgb(228, 228, 228);
+}
+.satuday {
+	background: rgb(160, 238, 221) !important;
+}
+.sunday {
+	background: rgb(255, 114, 192) !important;
+}
+.sum-hour-day td{
+	height: 20px !important;
+	background: rgb(228, 228, 228);
+}
+
+.wk-issue {
+	line-height: 29px;
+	border: 1px solid #CACACA;
+}
+
+.wt-day-table {
+	overflow: auto;
+	padding: 5px 0px;
+	width: 100%;
+	border: 1px solid #CACACA;
+	margin-top: 10px;
+}
+.wt-day-table table {
+	width: 100%;
+}
+.wt-day-table table input {
+	width: 93%;
+}
+.wt-day-table .input_comment {
+	width: 99%;
+}
+.project_tr {
+	background: #888888;
+	width: 100%;
+	height: 20px;
+}
+.active-day {
+	color: red;
+	background: rgb(127, 228, 240) !important;
+}
+.back-month {
+	font-size: 40px;
+	position: absolute;
+	margin-top: 6px;
+	left: 18px;
+	text-decoration: none;
+}
+.next-month {
+	font-size: 40px;
+	position: absolute;
+	margin-top: -50px;
+	left: 234px;
+	text-decoration: none;
+}
+.next-month:hover, .back-month:hover {
+	text-decoration: none;
+}

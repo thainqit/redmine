@@ -1,0 +1,287 @@
+<% if User.current.logged? %>
+<% content_for :header_tags do %>
+  <%= stylesheet_link_tag 'main', :plugin => 'work_time' %>
+<% end %>
+
+<div id="wt-content" >
+	<% if User.current.admin? %>
+		<div class="wt-header" >
+			chon thanh vien:
+			<select  name="member_quick_jump_box" onchange="if (this.value != '') { window.location = this.value; }">
+				<% User.all.each do |user| %>
+					<option value="/work_time/show?day=<%= params[:day] %>&month=<%= params[:month].to_i %>&year=<%= params[:year] %>&user=<%= user.id %>" <% if user.id ==  params[:user].to_i %> selected="selected" <% end %> >
+						<%= user.firstname %> <%= user.lastname %>
+					</option>
+				<% end %>
+			</select>
+		</div>
+	<% end %>
+
+	<!-- hien thi cac van de duoc giao -->
+	<div class="wt-month-table" >
+		<h3 >Bao cao hang thang (ten thanh vien)</h3>
+		<div class="month-table-left" >
+			<div class="show-month">
+				<a class="back-month" href="/work_time/show?day=<%= params[:day] %>&month=<%= params[:month].to_i - 1 %>&year=<%= params[:year] %>&user=<%= params[:user] %>"><</a>
+				<h3 class="title-month" >11/2014</h3>
+				<a class="next-month" href="/work_time/show?day=<%= params[:day] %>&month=<%= params[:month].to_i + 1 %>&year=<%= params[:year] %>&user=<%= params[:user] %>">></a>
+			</div>
+			<div class="show-work">
+				<div class="show-project">
+					<div style="line-height: 27px; text-align: right; background: #979797;">Tong so gio: </div>
+
+					<% @projects.each do |project| %>
+						<div class="wk-issue" style="background: #888888; height: 26px;">
+							<span><%= project.name %></span>
+						</div>
+						<% project.issues.where( :assigned_to_id => params[:user].to_i ).each do |issue| %>
+							<div class="wk-issue">
+							<a href="/issues/<%= issue.id %>" target="_blank">#<%= issue.id %>: <%= issue.subject %></a>
+							<span class="done_ratio">(<%= issue.done_ratio %> %)</span> 
+							<span style="float: right; margin-right: 3px;">
+							<% 
+									hour = 0
+						      UserIssueMonth.where(:issue => issue.id).each do |issues_month|
+						        hour = hour + issues_month.hour
+						      end
+							%> <%= hour %></span>
+							</div>
+						<% end %>
+
+					<% end %>
+
+					<% if User.current.admin? %>
+						<div class="check-day wk-issue">
+							<p>Kiem tra:</p>
+						</div>
+					<% end %>
+				</div>
+			</div>
+		</div>
+
+		<!-- Hien thi cac issue va thoi gian lam viec trong thang cua thanh vien -->
+		<div class="month-table-right" >
+			<table cellspacing="0" cellpadding="0">
+				<tr>
+					<% (1..@days_in_month).to_a.each do |x| %>
+						<% if params[:day].to_i == x %>
+							<th class="active-day" > <%= x %> </th>
+						<% elsif x < Time.now.day %>
+							<% if CheckIssueDay.where(:uid => params[:user], :day => x, :month => params[:month], :year => params[:year]).first.present? && CheckIssueDay.where(:uid => params[:user], :day => x, :month => params[:month], :year => params[:year]).first.check = true %>
+								<th><%= x %></th>
+							<% else %>
+								<th > <a href="/work_time/show?day=<%= x %>&month=<%= params[:month] %>&year=<%= params[:year] %>&user=<%= params[:user] %>"><%= x %></a> </th>
+							<% end %>
+						<% else %>
+								<th><%= x %></th>
+						<% end %>
+					<% end %>
+				</tr>
+				<tr>
+					<% @days.each do |day| %>
+						<% if day == 0 %>
+							<td class="day sunday">CN</td>
+						<% elsif day == 1 %>
+							<td class="day">Th.2</td>
+						<% elsif day == 2 %>
+						 <td class="day">Th.3</td>
+						<% elsif day == 3 %>
+							<td class="day">Th.4</td>
+						<% elsif day == 4 %>
+							<td class="day">Th.5</td>
+						<% elsif day == 5 %>
+							<td class="day">Th.6</td>
+						<% else %>
+							<td class="day satuday">Th.7</td>
+						<% end %>
+					<% end %> 
+				</tr>
+				<tr class="sum-hour-day" >
+					<% (1..@days_in_month).to_a.each do |x| %>
+						<td>
+							<% sum_hour_day = 0
+							UserIssueMonth.where( :year => params[:year], :month => params[:month], :day => x ).each do |issues_month1|
+								sum_hour_day += issues_month1.hour
+							end %>
+							<%= sum_hour_day %>
+						</td>
+					<% end %>
+				</tr>
+
+				<% @projects.each do |project| %>
+						<tr class="project_tr">
+							<td colspan="31" style="height: 22px;"></td>
+						</tr>
+						<% project.issues.where( :assigned_to_id => params[:user].to_i ).each do |issue| %>
+							<tr>
+								<% (1..@days_in_month).to_a.each do |x| %>
+								<td <% if  issue.start_date.to_s[0..3].to_i == params[:year].to_i && issue.start_date.to_s[5..6].to_i == params[:month].to_i && issue.start_date.to_s[8..9].to_i <= x.to_i && issue.due_date.to_s[8..9].to_i >= x.to_i %>
+								style="background: rgb(255, 247, 155);"
+								<% end %> >
+									<% UserIssueMonth.where(:issue => issue.id ).each do |issues_month| %>
+										<% if issues_month.day == x && issues_month.month == params[:month].to_i && issues_month.year == params[:year].to_i %>
+											<%= issues_month.hour %>
+										<% end %>
+									<% end %>
+								</td>
+								<% end %>
+							</tr>
+						<% end %>
+					<% end %>
+
+
+				<% Issue.where( :assigned_to_id => params[:user].to_i ).each do |issue| %>
+					
+				<% end %>
+				<% if User.current.admin? %>
+					<tr class="sum-hour-day" >
+						<% (1..@days_in_month).to_a.each do |x| %>
+							<td>
+								<% if x < Time.now.day  %>
+									<input type="checkbox" day="<%= x %>" year="<%= params[:year] %>" month="<%= params[:month] %>" user="<%= params[:user] %>" class="checkbox-day" <% if CheckIssueDay.where(:uid => params[:user], :day => x, :month => params[:month], :year => params[:year]).first.present? && CheckIssueDay.where(:uid => params[:user], :day => x, :month => params[:month], :year => params[:year]).first.check = true %>checked<% end %> >
+								<% end %>
+							</td>
+						<% end %>
+					</tr>
+				<% end %>
+			</table>
+		</div>
+	</div>
+
+	<!-- cap nhat thoi gian lam viec cac van de hang ngay -->
+	<% if params[:user].to_i == User.current.id %>
+		<form action="/work_time/create_user_issue" method="post">
+		<input name="current_id" type="hidden" value="<%= params[:user].to_i %>"/>
+		<input name="year" type="hidden" value="<%= params[:year] %>"/>
+		<input name="month" type="hidden" value="<%= params[:month] %>"/>
+		<input name="day" type="hidden" value="<%= params[:day] %>"/>
+			<div class="wt-day-table" >
+				<h3 >Bao cao hang ngay</h3>
+				<table cellpadding="1" cellspacing="1" border="1">
+					<tr>
+						<th>20/11/2014</th>
+						<th>Cong Viec</th>
+						<th>Hoat Dong</th>
+						<th>Trang Thai</th>
+						<th>Binh luan</th>
+					</tr>
+					<% @projects.each do |project| %>
+						<tr class="project_tr">
+							<td colspan="5"><%= project.name %></td>
+						</tr>
+						<% project.issues.where( :assigned_to_id => params[:user].to_i ).each do |issue| %>
+							<tr project="<%= project.id %>" user="User.current.id" month=<%= params[:month] %> >
+								<input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>"/>
+								
+								<input name="issues_month[<%= issue.id %>][year]" type="hidden" value="<%= params[:year] %>"/>
+								<input name="issues_month[<%= issue.id %>][month]" type="hidden" value="<%= params[:month] %>"/>
+								<input name="issues_month[<%= issue.id %>][day]" type="hidden" value="<%= params[:day] %>"/>
+
+								<td width="30%" > 
+								<a href="/issues/<%= issue.id %>" target="_blank">#<%= issue.id %>: <%= issue.subject %></a>
+								 <span class="done_ratio">(<%= issue.done_ratio %> %)</span> 
+								</td>
+								<td width="5%">
+									<input type="number" name="issues_month[<%= issue.id %>][hour]" placeholder="Giờ" min="0" value="<%=UserIssueMonth.where(:issue => issue.id, :year => params[:year], :month => params[:month], :day => params[:day] ).first.hour.to_i if UserIssueMonth.where(:issue => issue.id, :year => params[:year], :month => params[:month], :day => params[:day] ).first.present? %>">
+								</td>
+								<td width="10%"><%= issue.tracker.name %></td>
+								<td width="10%"><%= issue.status.name %></td>
+								<td width=""><input class="input_comment" name="issues_month[<%= issue.id %>][comment]"  type="text" placeholder="Bình luận" value="<%=UserIssueMonth.where(:issue => issue.id, :year => params[:year], :month => params[:month], :day => params[:day] ).first.comment if UserIssueMonth.where(:issue => issue.id, :year => params[:year], :month => params[:month], :day => params[:day] ).first.present?%>" ></td>
+							</tr>
+						<% end %>
+					<% end %>
+				</table>
+				<br/>
+				<input type="submit" value="Cap Nhat">
+			</div>
+		</form>
+	<% end %>
+
+	<!-- Ve bieu do so sanh gio thoi gian duoc giao va tong thoi gian thuc te -->
+	<% if User.current.admin? %>
+		<div class="chart">
+			<div id="chart_div" style="width: 100%; height: 500px;"></div>
+		</div>
+	<% end %>
+
+</div>
+
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript">
+  google.load("visualization", "1", {packages:["corechart"]});
+	google.setOnLoadCallback(drawChart);
+	function drawChart() {
+
+	var data = google.visualization.arrayToDataTable([
+	['Cong Viec', 'Du Dinh', 'Da lam', { role: 'style' }],
+	<%  @array_issue.each do |issue| %>
+		<%= raw issue %>
+	<% end %>
+	]);
+	var options = {
+	title: 'Bieu do thong ke',
+	hAxis: {title: 'Year', titleTextStyle: {color: '#888'}}
+	};
+
+	var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+
+	chart.draw(data, options);
+
+}
+</script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  $('body').on("click",".send-text",function(){
+
+    var project = $('.active-project').attr('value');
+    $.ajax({
+      url : '/work_time/create',
+      type : "POST",
+      data : 'message=' + message + '&project=' + project,
+      dataType : "script",
+      success : function(data) {
+      }
+    });
+  })
+
+  $('.checkbox-day').change(function() {
+  	if($("this").is(':checked')){
+		  var check = true;
+  	}else{
+		  var check = false;
+		}
+    var user = $(this).attr('user');
+    var day = $(this).attr('day');
+    var month = $(this).attr('month');
+    var year = $(this).attr('year');
+    $.ajax({
+      url : '/work_time/check_day',
+      type : "POST",
+      data : 'user=' + user + '&day=' + day + '&month=' + month + '&year=' + year + '&check=' + check,
+      dataType : "script",
+      success : function(data) {
+      }
+    });
+  });
+
+});
+
+</script>
+
+<style type="text/css">
+	.done_ratio {
+		color: red;
+	}
+	.check-day {
+		height: 24px;
+		text-align: right;
+	}
+	.check-day p {
+		line-height: 24px;
+		padding: 0px;
+		margin: 0px;
+		text-align: right;
+	}
+</style>
+<% end %>

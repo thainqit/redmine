@@ -1,0 +1,122 @@
+.cursor-pointer {
+  cursor: pointer;
+}
+.open-chat {
+  position: fixed;
+  right: 0px;
+  bottom: 0px;
+  background: #9C9C9C;
+  z-index: 999999999999;
+  padding: 5px 20px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  font-size: 15px;
+  color: #fff;
+}
+.active-project {
+  background: rgb(0, 97, 255) !important;
+}
+.width-100 {
+  width: 100% !important;
+}
+.hide-chat {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+}
+.hide-user {
+  position: absolute;
+  top: 10px;
+  left: 133px;
+}
+.show-user {
+  display: none;
+  position: absolute;
+  top: 12px;
+}
+#form-chat {
+  display: none;
+  z-index: 999999999999;
+  position: fixed;
+  right: 0px;
+  bottom: 0px;
+  width: 600px;
+  height: 500px;
+  border: 1px solid #898989;
+  background: #ebebeb;
+  border-radius: 5px !important;
+}
+#show-user {
+  width: 25%;
+  height: 450px;
+  float: left;
+  border-radius: 5px !important;
+}
+#show-user ul {
+  margin: 0px;
+  list-style: none;
+  padding: 10px 5px 10px 5px;
+  height: 200px;
+  overflow: auto;
+}
+#show-user ul li {
+  text-transform: capitalize;
+  font-size: 14px;
+  padding: 3px;
+  margin: 2px;
+}
+.select-project li {
+  background: rgb(131, 214, 218);
+}
+#show-chat {
+  width: 75%;
+  height: 450px;
+  float: left;
+  border-radius: 5px !important;
+}
+.current-user {
+  color: rgb(208, 59, 232) !important;
+}
+.chat-room ul {
+  margin: 0px;
+  padding: 5px;
+  height: 400px;
+  overflow: auto;
+  list-style: none;
+  border: 1px solid;
+}
+.chat-room ul li {
+  font-size: 14px;
+  padding: 3px;
+}
+.chat-room .date-chat {
+ color: #666;
+ }
+ .chat-room .user-chat {
+   color: #280083;
+   font-weight: bold;
+ }
+ #input-chat {
+  border: 1px;
+  width: 100%;
+  height: 50px;
+  float: left;
+  border-radius: 5px !important;
+}
+#input-chat input[type="text"] {
+  width: 85%;
+  height: 25px;
+  margin-top: 10px;
+  margin-left: 8px;
+}
+.send-text {
+  height: 31px;
+  margin-top: 10px;
+  width: 60px;
+  margin-left: 5px;
+  border-radius: 3px;
+  background: #F95454;
+}
+.select-project {
+  height: 38px;
+}
